@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   Menu,
   X,
@@ -25,6 +26,15 @@ import {
   ExternalLink,
   CheckCircle,
   Clock,
+  Star,
+  Quote,
+  Users,
+  Award,
+  Briefcase,
+  Phone,
+  Twitter,
+  Linkedin,
+  Instagram,
 } from "lucide-react";
 
 export default function Home() {
@@ -43,6 +53,74 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  // Stats Counter State
+  const [counts, setCounts] = useState({ clients: 0, quality: 0, projects: 0, experience: 0 });
+  const [countsStarted, setCountsStarted] = useState(false);
+  const statsRef = useRef(null);
+
+  // Animate counters when section comes into view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !countsStarted) {
+          setCountsStarted(true);
+          const targets = { clients: 50, quality: 100, projects: 120, experience: 5 };
+          const duration = 2000;
+          const steps = 60;
+          const interval = duration / steps;
+          let step = 0;
+          const timer = setInterval(() => {
+            step++;
+            const progress = step / steps;
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCounts({
+              clients: Math.round(eased * targets.clients),
+              quality: Math.round(eased * targets.quality),
+              projects: Math.round(eased * targets.projects),
+              experience: Math.round(eased * targets.experience),
+            });
+            if (step >= steps) clearInterval(timer);
+          }, interval);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (statsRef.current) observer.observe(statsRef.current);
+    return () => observer.disconnect();
+  }, [countsStarted]);
+
+  // Testimonials State
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const testimonials = [
+    {
+      name: "Chukwuemeka Obi",
+      role: "CEO, NexPay Fintech",
+      location: "Lagos, Nigeria",
+      image: "/testimonial-african-man.png",
+      review:
+        "Aditech Global Service delivered our fintech mobile app beyond expectations. The level of precision in their code architecture and the seamless payment flow they built is nothing short of world-class. Our app has processed over ₦200M in transactions since launch without a single downtime incident.",
+      rating: 5,
+    },
+    {
+      name: "Adaeze Nwosu",
+      role: "Founder, StyleVault E-Commerce",
+      location: "Abuja, Nigeria",
+      image: "/testimonial-african-woman.png",
+      review:
+        "Working with Aditech was a transformative experience for our brand. They rebuilt our entire e-commerce platform and implemented a stunning UI design system that tripled our conversion rate within 60 days. Their attention to detail and commitment to delivery timelines is unmatched in the industry.",
+      rating: 5,
+    },
+    {
+      name: "James Whitfield",
+      role: "Product Director, SaaSFlow UK",
+      location: "London, United Kingdom",
+      image: "/testimonial-white-man.png",
+      review:
+        "We contracted Aditech to build our Admob utility app suite, and the results speak for themselves — our passive ad revenue hit $18,000 USD in the first three months. Their deep expertise in Admob monetization strategies and clean utility UX design sets them apart from any agency we've worked with globally.",
+      rating: 5,
+    },
+  ];
 
   // Handle Tab Swapping
   const handleTabChange = (tabId) => {
@@ -531,6 +609,163 @@ export default function Home() {
                       <Info className="w-3.5 h-3.5 text-brand-slateLight" />
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ======================================================== */}
+            {/* ANIMATED STATS COUNTER SECTION */}
+            {/* ======================================================== */}
+            <div ref={statsRef} className="mb-24 rounded-3xl overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-indigo via-indigo-700 to-brand-rose opacity-95 rounded-3xl" />
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",
+                  backgroundSize: "60px 60px",
+                }}
+              />
+              <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-0">
+                {[
+                  { value: counts.clients, suffix: "+", label: "Happy Clients", icon: Users },
+                  { value: counts.quality, suffix: "%", label: "Work Quality", icon: Award },
+                  { value: counts.projects, suffix: "+", label: "Completed Projects", icon: Briefcase },
+                  { value: counts.experience, suffix: "+ Yrs", label: "Industry Experience", icon: TrendingUp },
+                ].map((stat, i) => (
+                  <div
+                    key={i}
+                    className={`flex flex-col items-center justify-center text-center p-10 ${
+                      i < 3 ? "border-r border-white/10" : ""
+                    } ${i >= 2 ? "border-t border-white/10 lg:border-t-0" : ""}`}
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4">
+                      <stat.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <p className="font-display font-extrabold text-4xl sm:text-5xl text-white mb-2 tabular-nums">
+                      {stat.value}{stat.suffix}
+                    </p>
+                    <p className="text-xs font-bold tracking-widest uppercase text-white/60">
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ======================================================== */}
+            {/* TESTIMONIALS SECTION */}
+            {/* ======================================================== */}
+            <div className="mb-24">
+              <div className="text-center max-w-2xl mx-auto mb-16">
+                <span className="text-xs font-bold tracking-wider uppercase text-brand-indigo">
+                  Client Testimonials
+                </span>
+                <h2 className="font-display font-bold text-3xl sm:text-4xl tracking-tight text-brand-slateDark mt-2">
+                  Trusted by Founders & Enterprises Globally
+                </h2>
+                <p className="text-brand-slateMuted text-sm mt-3">
+                  Real results, real voices. Here's what our clients say about working with Aditech.
+                </p>
+              </div>
+
+              <div className="relative">
+                {/* Main Testimonial Card */}
+                <div className="glass-card rounded-3xl p-8 sm:p-12 relative overflow-hidden">
+                  <div className="absolute top-6 right-8 text-brand-indigo/10">
+                    <Quote className="w-24 h-24" />
+                  </div>
+                  <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+                    <div className="shrink-0 flex flex-col items-center gap-3">
+                      <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-brand-indigo/20 shadow-lg">
+                        <Image
+                          src={testimonials[activeTestimonial].image}
+                          alt={testimonials[activeTestimonial].name}
+                          width={96}
+                          height={96}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-bold text-sm text-brand-slateDark">
+                          {testimonials[activeTestimonial].name}
+                        </p>
+                        <p className="text-xs text-brand-slateMuted">
+                          {testimonials[activeTestimonial].role}
+                        </p>
+                        <div className="flex items-center gap-0.5 mt-1 justify-center">
+                          <MapPin className="w-2.5 h-2.5 text-brand-rose" />
+                          <span className="text-[10px] text-brand-slateLight">
+                            {testimonials[activeTestimonial].location}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1 mb-4">
+                        {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                      <p className="text-brand-slateDark text-base sm:text-lg leading-relaxed italic font-medium">
+                        &ldquo;{testimonials[activeTestimonial].review}&rdquo;
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-10">
+                    <button
+                      onClick={() => setActiveTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
+                      className="text-xs font-bold text-brand-slateMuted hover:text-brand-indigo transition-colors flex items-center gap-1"
+                    >
+                      <ArrowRight className="w-3.5 h-3.5 rotate-180" /> Previous
+                    </button>
+                    <div className="flex items-center gap-3">
+                      {testimonials.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActiveTestimonial(i)}
+                          className={`rounded-full transition-all duration-300 ${
+                            i === activeTestimonial
+                              ? "w-8 h-2.5 bg-brand-indigo"
+                              : "w-2.5 h-2.5 bg-brand-slateDark/20 hover:bg-brand-indigo/50"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setActiveTestimonial((prev) => (prev + 1) % testimonials.length)}
+                      className="text-xs font-bold text-brand-slateMuted hover:text-brand-indigo transition-colors flex items-center gap-1"
+                    >
+                      Next <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mini Preview Cards */}
+                <div className="grid grid-cols-3 gap-4 mt-6">
+                  {testimonials.map((t, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveTestimonial(i)}
+                      className={`p-4 rounded-2xl text-left transition-all duration-300 border ${
+                        i === activeTestimonial
+                          ? "border-brand-indigo bg-brand-indigo/5 shadow-lg shadow-brand-indigo/10"
+                          : "border-brand-slateDark/[0.08] bg-white hover:border-brand-indigo/30"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-7 h-7 rounded-lg overflow-hidden shrink-0">
+                          <Image src={t.image} alt={t.name} width={28} height={28} className="w-full h-full object-cover" />
+                        </div>
+                        <p className="text-[11px] font-bold text-brand-slateDark truncate">{t.name}</p>
+                      </div>
+                      <div className="flex gap-0.5">
+                        {[...Array(t.rating)].map((_, s) => (
+                          <Star key={s} className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -1078,37 +1313,170 @@ export default function Home() {
         )}
       </main>
 
-      {/* Premium Minimalist Footer */}
-      <footer className="border-t border-brand-slateDark/5 py-12 relative z-10 bg-white/40">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => handleTabChange("home")}
-          >
-            <span className="font-display font-bold text-base tracking-tight uppercase text-brand-slateDark">
-              ADITECH GLOBAL
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-rose"></span>
+      {/* Enhanced Professional Footer */}
+      <footer className="relative z-10 bg-brand-slateDark text-white">
+        {/* Top Footer Grid */}
+        <div className="max-w-7xl mx-auto px-6 pt-16 pb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+            {/* Brand Column */}
+            <div className="lg:col-span-1">
+              <div
+                className="flex items-center gap-2 cursor-pointer mb-4"
+                onClick={() => handleTabChange("home")}
+              >
+                <span className="font-display font-bold text-lg tracking-tight uppercase text-white">
+                  ADITECH
+                </span>
+                <span className="w-2 h-2 rounded-full bg-gradient-to-r from-brand-indigo to-brand-rose"></span>
+                <span className="font-display font-bold text-lg tracking-tight uppercase text-white/60">
+                  GLOBAL
+                </span>
+              </div>
+              <p className="text-white/50 text-xs leading-relaxed mb-6">
+                Engineering high-performance digital solutions, passive Admob monetization systems, and conversion-driven software products for modern enterprises globally.
+              </p>
+              {/* Social Links */}
+              <div className="flex items-center gap-3">
+                <a
+                  href="https://wa.me/2349135271024"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-emerald-500/80 transition-colors"
+                  title="WhatsApp"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                </a>
+                <a
+                  href="mailto:aditechglobalservice@gmail.com"
+                  className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-brand-indigo/80 transition-colors"
+                  title="Email"
+                >
+                  <Mail className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Quick Links Column */}
+            <div>
+              <h4 className="text-xs font-bold tracking-widest uppercase text-white/40 mb-5">
+                Quick Links
+              </h4>
+              <ul className="flex flex-col gap-3">
+                {[
+                  { label: "Home", tab: "home" },
+                  { label: "About Us", tab: "about" },
+                  { label: "Services", tab: "services" },
+                  { label: "Contact Us", tab: "contact" },
+                ].map((link) => (
+                  <li key={link.tab}>
+                    <button
+                      onClick={() => handleTabChange(link.tab)}
+                      className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-2 group"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-brand-indigo group-hover:w-3 transition-all duration-300"></span>
+                      {link.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Services Column */}
+            <div>
+              <h4 className="text-xs font-bold tracking-widest uppercase text-white/40 mb-5">
+                Our Services
+              </h4>
+              <ul className="flex flex-col gap-3">
+                {[
+                  "Mobile App Development",
+                  "Enterprise Web Systems",
+                  "Admob Utility Apps",
+                  "Brand & UI/UX Design",
+                  "Video Production",
+                  "SMM & Marketing",
+                ].map((service) => (
+                  <li key={service}>
+                    <button
+                      onClick={() => handleTabChange("services")}
+                      className="text-white/60 hover:text-white text-sm transition-colors text-left"
+                    >
+                      {service}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact / Address Column */}
+            <div>
+              <h4 className="text-xs font-bold tracking-widest uppercase text-white/40 mb-5">
+                Get In Touch
+              </h4>
+              <ul className="flex flex-col gap-4">
+                <li className="flex items-start gap-3">
+                  <MapPin className="w-4 h-4 text-brand-rose mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-white/90 text-sm font-semibold">Head Office</p>
+                    <p className="text-white/50 text-xs leading-relaxed mt-0.5">
+                      Ado-Ekiti, Ekiti State,<br />Nigeria
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Mail className="w-4 h-4 text-brand-indigo mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-white/90 text-sm font-semibold">Email Us</p>
+                    <a
+                      href="mailto:aditechglobalservice@gmail.com"
+                      className="text-white/50 hover:text-white text-xs transition-colors mt-0.5 block"
+                    >
+                      aditechglobalservice@gmail.com
+                    </a>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Phone className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-white/90 text-sm font-semibold">WhatsApp</p>
+                    <a
+                      href="https://wa.me/2349135271024"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/50 hover:text-emerald-400 text-xs transition-colors mt-0.5 block"
+                    >
+                      +234 913 527 1024
+                    </a>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
+        </div>
 
-          <p className="text-xs text-brand-slateLight text-center sm:text-left">
-            &copy; 2026 Aditech Global Service. All rights reserved. Precision Software Systems.
-          </p>
-
-          <div className="flex items-center gap-4 text-xs text-brand-slateLight">
-            <button
-              onClick={() => handleTabChange("about")}
-              className="hover:text-brand-indigo transition-colors"
-            >
-              Privacy Policy
-            </button>
-            <span>&middot;</span>
-            <button
-              onClick={() => handleTabChange("contact")}
-              className="hover:text-brand-indigo transition-colors"
-            >
-              Terms of Operations
-            </button>
+        {/* Bottom Footer Bar */}
+        <div className="border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-white/30 text-center sm:text-left">
+              &copy; 2026 Aditech Global Service. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4 text-xs text-white/30">
+              <button
+                onClick={() => handleTabChange("about")}
+                className="hover:text-white/70 transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <span>&middot;</span>
+              <button
+                onClick={() => handleTabChange("contact")}
+                className="hover:text-white/70 transition-colors"
+              >
+                Terms of Operations
+              </button>
+              <span>&middot;</span>
+              <span>Precision Software Systems</span>
+            </div>
           </div>
         </div>
       </footer>
