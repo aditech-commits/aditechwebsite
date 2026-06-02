@@ -122,6 +122,26 @@ export default function Home() {
     },
   ];
 
+  // Scroll animation observer — triggers .visible on all animated elements
+  useEffect(() => {
+    const animatedEls = document.querySelectorAll(
+      ".fade-up, .zoom-in, .fade-left, .fade-right"
+    );
+    const scrollObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            scrollObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    animatedEls.forEach((el) => scrollObserver.observe(el));
+    return () => scrollObserver.disconnect();
+  }, [activeTab]); // re-run when tab changes so new elements are observed
+
   // Handle Tab Swapping
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
@@ -354,24 +374,92 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Trust Bar */}
-            <div className="border-y border-brand-slateDark/5 py-10 mb-20">
-              <p className="text-center text-xs font-semibold tracking-wider uppercase text-brand-slateLight mb-6">
-                Trusted by ambitious tech founders and modern enterprises globally
+            {/* Tech Stack Showcase */}
+            <div className="mb-24 fade-up">
+              <p className="text-center text-xs font-bold tracking-widest uppercase text-brand-indigo mb-8">
+                The Tools We Use to Build & Deploy Cutting-Edge Software
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-12 md:gap-20 opacity-50 hover:opacity-75 transition-opacity duration-300">
-                <span className="font-display font-bold tracking-widest text-lg text-brand-slateDark">
-                  VALO.AI
-                </span>
-                <span className="font-display font-bold tracking-widest text-lg text-brand-slateDark">
-                  NEXUS
-                </span>
-                <span className="font-display font-bold tracking-widest text-lg text-brand-slateDark">
-                  PAYSTREAM
-                </span>
-                <span className="font-display font-bold tracking-widest text-lg text-brand-slateDark">
-                  FLOWSTATE
-                </span>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                {[
+                  { name: "React.js", desc: "Interactive Web Systems", color: "from-sky-400 to-blue-600" },
+                  { name: "Flutter", desc: "Cross-Platform Mobile Apps", color: "from-blue-400 to-indigo-500" },
+                  { name: "WordPress", desc: "Dynamic Content Platforms", color: "from-blue-600 to-blue-800" },
+                  { name: "Vercel", desc: "Ultra-Fast Edge Hosting", color: "from-slate-800 to-black" },
+                  { name: "Supabase", desc: "Scalable Postgres Backend", color: "from-emerald-400 to-emerald-600" },
+                  { name: "Firebase", desc: "Real-time Databases & Auth", color: "from-amber-400 to-orange-500" },
+                ].map((tool, i) => (
+                  <div
+                    key={tool.name}
+                    className="p-6 rounded-2xl border border-brand-slateDark/[0.06] bg-white shadow-sm hover:shadow-md hover:border-brand-indigo/30 transition-all text-center flex flex-col items-center justify-center zoom-in"
+                    style={{ transitionDelay: `${i * 100}ms` }}
+                  >
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center text-white font-black text-xs mb-3 shadow-md`}>
+                      {tool.name[0]}
+                    </div>
+                    <h4 className="font-bold text-sm text-brand-slateDark">{tool.name}</h4>
+                    <p className="text-[10px] text-brand-slateMuted mt-1 leading-tight">{tool.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AI & Security Section */}
+            <div className="mb-24 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* AI Block (Left) */}
+              <div className="lg:col-span-6 fade-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-rose/5 border border-brand-rose/10 mb-4">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-rose animate-ping"></span>
+                  <span className="text-[10px] font-bold tracking-wider uppercase text-brand-rose">
+                    Speed & Efficiency
+                  </span>
+                </div>
+                <h3 className="font-display font-bold text-3xl sm:text-4xl text-brand-slateDark leading-tight mb-4">
+                  Leveraging AI Tools to Deliver at Record Speed
+                </h3>
+                <p className="text-brand-slateMuted text-sm leading-relaxed mb-6">
+                  We leverage and build faster with cutting-edge AI Tools. Your idea does not need several weeks or months to come live. By combining advanced AI-driven code generation, automated visual UI pipelines, and state-of-the-art developer tooling, we shorten time-to-market by up to 70% without sacrificing quality.
+                </p>
+                <div className="bg-brand-indigo/5 border border-brand-indigo/10 p-5 rounded-2xl">
+                  <p className="text-xs font-bold text-brand-indigo uppercase tracking-wider mb-1">
+                    Agile AI Pipeline
+                  </p>
+                  <p className="text-xs text-brand-slateMuted leading-relaxed">
+                    Concept to fully functional production-ready software in days, not months. Run builds and live tests instantly.
+                  </p>
+                </div>
+              </div>
+
+              {/* Security Block (Right) */}
+              <div className="lg:col-span-6 fade-right">
+                <div className="bg-white border border-brand-slateDark/[0.08] p-8 sm:p-10 rounded-3xl shadow-xl relative overflow-hidden">
+                  <div className="absolute -top-12 -right-12 w-48 h-48 ambient-glow-indigo"></div>
+                  <div className="relative z-10">
+                    <h3 className="font-display font-bold text-2xl text-brand-slateDark mb-6 flex items-center gap-2">
+                      <ShieldCheck className="w-7 h-7 text-emerald-500" /> Secured by Design
+                    </h3>
+                    <p className="text-brand-slateMuted text-xs mb-6">
+                      Our products are audited and built with high-grade security measures to safeguard your platform, credentials, and customer data:
+                    </p>
+                    <ul className="flex flex-col gap-4">
+                      {[
+                        { title: "End-to-End Encryption", desc: "Data is secured using AES-256 standards both in transit and at rest." },
+                        { title: "Secure OAuth & MFA Authentication", desc: "User identities are hardened with multi-factor token protocols." },
+                        { title: "Real-time DDoS Mitigation", desc: "Protected by Vercel's global edge network against high-volume threats." },
+                        { title: "Strict SSL/TLS & HTTPS Enforcement", desc: "All connections enforce clean HTTPS transport and HTTP security headers." },
+                      ].map((item, idx) => (
+                        <li key={idx} className="flex gap-3">
+                          <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0 mt-0.5">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-brand-slateDark">{item.title}</p>
+                            <p className="text-[11px] text-brand-slateMuted mt-0.5">{item.desc}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -766,6 +854,60 @@ export default function Home() {
                       </div>
                     </button>
                   ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ======================================================== */}
+            {/* AFFILIATE PROGRAM SECTION */}
+            {/* ======================================================== */}
+            <div className="mb-24 zoom-in">
+              <div className="bg-gradient-to-br from-brand-slateDark to-slate-900 rounded-3xl p-8 sm:p-12 relative overflow-hidden text-white shadow-2xl border border-white/5">
+                <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-brand-rose opacity-10 blur-[100px]" />
+                <div className="absolute -top-16 -left-16 w-64 h-64 bg-brand-indigo opacity-10 blur-[100px]" />
+                
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7">
+                    <span className="text-xs font-bold tracking-widest uppercase text-brand-indigo bg-brand-indigo/10 px-3 py-1 rounded-full border border-brand-indigo/20 inline-block mb-4">
+                      Partnership & Referrals
+                    </span>
+                    <h2 className="font-display font-bold text-3xl sm:text-4xl text-white leading-tight mb-4">
+                      Recommend Clients & Earn High Commissions
+                    </h2>
+                    <p className="text-white/60 text-sm leading-relaxed mb-6">
+                      Introduce clients, startups, or companies needing top-tier mobile apps, custom web software, or monetization configurations to Aditech Global. We pay a competitive commission on every successful project that closes.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                      {[
+                        { label: "1. Introduce Us", desc: "Connect the client to us via email or WhatsApp." },
+                        { label: "2. We Deliver", desc: "We coordinate, negotiate, and build the software." },
+                        { label: "3. You Get Paid", desc: "Earn 10% to 30% payout once project starts." },
+                      ].map((step, idx) => (
+                        <div key={idx} className="bg-white/5 border border-white/10 p-4 rounded-xl">
+                          <p className="text-xs font-bold text-brand-rose">{step.label}</p>
+                          <p className="text-[11px] text-white/50 mt-1">{step.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-5 bg-white/5 border border-white/10 p-6 sm:p-8 rounded-2xl text-center">
+                    <p className="text-xs font-bold text-white/50 uppercase tracking-widest mb-1">
+                      Commission Tier
+                    </p>
+                    <p className="font-display font-extrabold text-5xl sm:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-brand-indigo to-brand-rose mb-4">
+                      10% - 30%
+                    </p>
+                    <p className="text-xs text-white/70 leading-relaxed mb-6">
+                      Earn between ₦50,000 and ₦1,500,000 per successful referral depending on project size.
+                    </p>
+                    <button
+                      onClick={() => handleTabChange("contact")}
+                      className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-rose text-white font-bold text-xs tracking-wider uppercase shadow-xl hover:opacity-95 transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                    >
+                      <BadgeDollarSign className="w-4 h-4" /> Become a Partner
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
